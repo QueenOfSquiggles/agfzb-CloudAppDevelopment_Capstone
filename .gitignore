@@ -143,3 +143,4 @@ server/djangoapp/migrations/
 *.pyc
 server/djangoapp/migrations/
 
+server/db.sqlite3

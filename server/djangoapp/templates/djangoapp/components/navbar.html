@@ -1,20 +1,23 @@
-<nav
-  class="navbar navbar-expand-xl navbar-expand-lg navbar-expand-md navbar-expand-sm navbar-light"
->
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
   <div class="collapse navbar-collapse" id="navbarSupportedContent">
     <ul class="navbar-nav mr-auto">
       <li class="nav-item">
         <a class="nav-link" href="/djangoapp">Home</a>
       </li>
-      <li class="nav-item">
-        <a class="nav-link" href="/djangoapp/dealers">Dealers</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" href="/djangoapp/add_review">Add Review</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" href="/djangoapp/register">Register</a>
-      </li>
+
+      <!--
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/djangoapp/dealers">Dealers</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/djangoapp/add_review">Add Review</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/djangoapp/register">Register</a>
+        </li>
+      -->
+
       <li class="nav-item">
         <a class="nav-link" href="/djangoapp/about">About Us</a>
       </li>
@@ -22,5 +25,49 @@
         <a class="nav-link" href="/djangoapp/contact">Contact</a>
       </li>
     </ul>
+    {% if user.is_authenticated %}
+
+    <div class="form-inline my-2 my-lg-0">
+      <a href="#" class="btn btn-outline-info my-2 my-sm-0">
+        '{{user.username}}' ({{user.first_name}} {{user.last_name}})
+      </a>
+      <a
+        href="{% url 'djangoapp:logout' %}"
+        class="btn btn-outline-success my-2 my-sm-0"
+        >Logout</a
+      >
+    </div>
+
+    {% else %}
+
+    <form
+      class="form-inline my-2 my-lg-0"
+      action="{% url 'djangoapp:login'%}"
+      method="post"
+    >
+      {% csrf_token %}
+      <input
+        class="form-control mr-sm-2"
+        type="text"
+        placeholder="username"
+        name="username"
+        required
+      />
+      <input
+        class="form-control mr-sm-2"
+        type="password"
+        placeholder="password"
+        name="password"
+        required
+      />
+      <button class="btn btn-outline-success my-2 my-sm-0" type="submit">
+        Login
+      </button>
+      <a href="/djangoapp/register" class="btn btn-outline-info my-2 my-sm-0">
+        Sign Up
+      </a>
+    </form>
+    {% endif %}
   </div>
 </nav>
+<br />
