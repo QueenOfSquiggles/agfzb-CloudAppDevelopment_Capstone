@@ -3,6 +3,10 @@
 import os
 import sys
 
+from django.conf import settings
+
+from settings import ALLOWED_HOSTS
+
 
 def main():
     """Run administrative tasks."""
