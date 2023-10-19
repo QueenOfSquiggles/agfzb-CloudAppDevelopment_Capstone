@@ -1,18 +1,93 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
+  <head>
+    <meta charset="UTF-8" />
     <title>Dealership Review</title>
     {% load static %}
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
-</head>
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+    />
+  </head>
 
-    <body>
-
+  <body>
     <!--Add a nav bar here -->
+    {% include "./components/navbar.html" %}
+    <!-- :: -->
+    <div style="margin: auto; padding-left: 10%; padding-right: 10%">
+    <!--Dealership heading-->
+    {% if dealer %}
+        <div class="jumbotron jumbotron-fluid" style="padding: 5%;">
+            <h2 class="display-4">{{dealer.full_name}}, {{dealer.st}}</h2>
+            <p class="lead">{{dealer.address}} {{dealer.city}}, {{dealer.st}} {{dealer.zip}}</p>
+            <blockquote class="blockquote text-right">
+              <p class="mb-0">Consumer score: {{ score }}</p>
+              <footer class="blockquote-footer">Consumer scores are generated from approximate sentiment of review text and may be slightly inaccurate</footer>
+            </blockquote>
+            <p class="lead">
+              {% url 'djangoapp:add_review' dealer.id as add_review_url %}
+              <a class="btn btn-primary btn-lg" href="{{ add_review_url }}" role="button">Add a review</a>
+            </p>
+        </div>
+    {% endif %}
+      {% if reviews %}
+      <!-- Add reviews as cards -->
+      <div class="container">
+        <div class="row">
+          {% for entry in reviews %}
+          <div class="col-sm">
+            {% if entry.sentiment == "positive" %}
+            <div class="card text-white bg-success mb-3" style="margin: 1rem;">
+            {% elif entry.sentiment == "neutral" %}
+            <div class="card text-white bg-warning mb-3" style="margin: 1rem;">
+            {% elif entry.sentiment == "negative" %}
+            <div class="card text-white bg-danger mb-3" style="margin: 1rem;">
+            {% else %}
+            <div class="card text-white bg-info mb-3" style="margin: 1rem;">
+                <p>Unrecognized sentiment: <i>{{entry.sentiment}}</i></p>
+            {% endif %}
+              <div class="card-body">
+                <h5 class="card-title">{{entry.name}} is feeling {{entry.sentiment}}</h5>
+                <p class="card-text">{{entry.review}}</p>
 
-    <!-- Add reviews as cards -->
+                {% if entry.purchase %}
+                <ul class="list-group list-group-flush text-dark">
+                    <li class="list-group-item">{{entry.car_make}} {{entry.car_model}}, {{entry.car_year}}</li>
+                    <li class="list-group-item">Purchased {{entry.purchase_date}}</li>
+                </ul>
 
-    </body>
+                <!-- <div class="table-responsive">
+                    <table class="table table-sm table-hover">
+                    <thead>
+                        <th scope="col">Make</th>
+                        <th scope="col">Model</th>
+                        <th scope="col">Year</th>
+                        <th scope="col">Purchased On</th>
+                    </thead>
+                    <tbody>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tbody>
+                    </table>
+                </div> -->
+                {% endif %}
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+          <!-- :: -->
+          {% else %}
+          <div class="card">
+            <div class="card-body">
+              <h5 class="card-title">No Reviews Yet!</h5>
+              <p class="card-text">We'll have more reviews soon!!!</p>
+            </div>
+          </div>
 
+        {% endif %}
+      </div>
+    </div>
+  </body>
 </html>

@@ -9,6 +9,9 @@ from django.contrib import messages
 from datetime import datetime
 import logging
 import json
+from djangoapp.models import CarMake, CarModel
+
+from djangoapp.restapis import get_dealer_by_id, get_dealer_reviews_from_cf, get_dealers_from_cf, post_review
 
 # Get an instance of a logger
 logger = logging.getLogger(__name__)
@@ -77,14 +80,73 @@ def registration_request(request):
 def get_dealerships(request):
     context = {}
     if request.method == "GET":
-        return render(request, 'djangoapp/index.html', context)
-
+        # isn't it super bad practice to just hard-code the API endpoint in the code? Especially in a public repo???
+        # IDGAF, IBM doesn't charge me since it's part of a course. Fuck 'em
+        dealerships = get_dealers_from_cf()
+        dealer_names = list(map(lambda d: d.short_name, dealerships))
+        return render(request, "djangoapp/index.html", context={
+            'dealers': dealerships
+        })
+        # return HttpResponse(dealer_names)
 
 # Create a `get_dealer_details` view to render the reviews of a dealer
-# def get_dealer_details(request, dealer_id):
-# ...
+def get_dealer_details(request, dealer_id):
+    reviews = get_dealer_reviews_from_cf(dealer_id)
+    dealer = get_dealer_by_id(dealer_id)
+    score = 0
+    for rev in reviews:
+        match(rev.sentiment):
+            case "positive":
+                score += 1
+            case "negative":
+                score -= 1
+
+    return render(request, "djangoapp/dealer_details.html", context={
+        "reviews" : reviews,
+        "dealer": dealer,
+        "score" : score
+    })
 
 # Create a `add_review` view to submit a review
 # def add_review(request, dealer_id):
 # ...
+
+def add_review(request, dealer_id):
+    if request.user.is_authenticated:
+        context = {}
+        if request.method == "GET":
+            context["dealerObj"] = get_dealer_by_id(dealer_id)
+            context["dealership"] = dealer_id
+            dealer_models =list(CarModel.objects.all())
+            dealer_models = filter(lambda d: d.dealer_id == dealer_id, dealer_models)
+            context["models"] = dealer_models
+            return render(request, "djangoapp/add_review.html", context=context)
+        if request.method == "POST":
+            
+            car_model = {}
+            if "car_model" in request.POST and request.POST["car_model"] != "":
+                car_model = CarModel.objects.get(id==int(request.POST["car_model"]))
+            else:
+                car_model = CarModel.objects.first()
+            payload = {
+                "review": {
+                    "id" : 0,
+                    "time": str(datetime.now().utcnow().isoformat()),
+                    # parameters for API
+                    "name": request.user.username,
+                    "dealership": dealer_id,
+                    "review": str(request.POST["review"]),
+                    "purchase": bool(request.POST.get("purchase", "False") == "True"),
+                    "purchase_date": str(request.POST.get("purchase_date", datetime.now())),
+                    "car_make": car_model.car_make.name,
+                    "car_model": car_model.name,
+                    "car_year": str(car_model.year),
+                    "another": "discarded value because this doesn't need to exist LOL"
+                }
+            }
+            print("Adding review from views with payload: ",json.dumps(payload, indent=1))
+
+            post_review(payload=payload)
+            return redirect("djangoapp:dealer_details", dealer_id=dealer_id)
+    return redirect("djangoapp:index")
 

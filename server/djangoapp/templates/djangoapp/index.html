@@ -6,26 +6,30 @@
     <!--Add a nav bar here -->
     {% include "./components/navbar.html" %}
 
-    <!--Add a dealer table here -->
-    <div class="table-responsive">
-      <table class="table table-striped table-bordered table-hover">
-        <thead>
-          <tr>
-            <th scope="col">A</th>
-            <th scope="col">B</th>
-            <th scope="col">C</th>
-            <th scope="col">D</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>1</td>
-            <td>2</td>
-            <td>3</td>
-            <td>4</td>
-          </tr>
-        </tbody>
-      </table>
+    <div style="margin: auto; padding-left: 10%; padding-right: 10%">
+      <!--Add a dealer table here -->
+      <div class="table-responsive">
+        <table class="table table-sm table-striped table-bordered table-hover">
+          <thead>
+            <tr>
+              <th scope="col">ID</th>
+              <th scope="col">Name (Short Name)</th>
+              <th scope="col">Address</th>
+              <th scope="col">Lattitude / Longitude</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for entry in dealers %}
+            <tr>
+              <th scope="row">{{entry.id}}</td>
+              <td><a href="/djangoapp/dealer/{{entry.id}}"> {{entry.full_name}} ({{entry.short_name}})</a></td>
+              <td>{{entry.address}}, {{entry.city}}, {{entry.st}} {{entry.zip}}</td>
+              <td>{{entry.lat}} / {{entry.long}}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
     </div>
   </body>
 </html>
