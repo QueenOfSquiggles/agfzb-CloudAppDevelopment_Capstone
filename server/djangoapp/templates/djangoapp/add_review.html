@@ -19,7 +19,7 @@
     <!--Add review form here -->
     {% include "./components/navbar.html" %}
     <!-- :: -->
-    <div class="container-fluid">
+    <div class="container">
       <div class="jumbotron col-lg">
         <h1 class="display text-center">
           Add a review
@@ -86,8 +86,8 @@
                 <option value="" selected>None</option>
                 {% for model in models %}
                 <option value="{{ model.id }}">
-                  {{model.car_make.name}} "{{model.name}}" {{model.type}}
-                  ({{model.year.year}})
+                  {{model.name}}-{{model.car_make.name}}--{{model.year|date:"Y"}}
+                  ({{model.id}})
                 </option>
                 {% endfor %}
               </select>
@@ -115,4 +115,9 @@
       </div>
     </div>
   </body>
+  <script type="text/javascript">
+    $(".purchase_date").datepicker({
+      format: "mm/dd/yyyy",
+    });
+  </script>
 </html>

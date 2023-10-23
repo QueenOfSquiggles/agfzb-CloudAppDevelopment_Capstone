@@ -123,19 +123,25 @@ def add_review(request, dealer_id):
             return render(request, "djangoapp/add_review.html", context=context)
         if request.method == "POST":
             
-            car_model = {}
-            if "car_model" in request.POST and request.POST["car_model"] != "":
-                car_model = CarModel.objects.get(id==int(request.POST["car_model"]))
-            else:
-                car_model = CarModel.objects.first()
+            car_model = CarModel.objects.first()
+            car_model_post = request.POST.get("car_model", "")
+            if car_model_post != "":
+                try:
+                    model_id = int(car_model_post)
+                    car_model = CarModel.objects.get(id=model_id)
+                except CarModel.DoesNotExist as dne:
+                    print(f"Car Model {car_model_post} does not exist in DB!! --> {dne}")
+                except Exception as e:
+                    print(f"Unhandled error during acquisition of car model {car_model_post}! --> {e}")
+
             payload = {
                 "review": {
-                    "id" : 0,
+                    "id" : 0, #what is this id even used for???
                     "time": str(datetime.now().utcnow().isoformat()),
                     # parameters for API
                     "name": request.user.username,
                     "dealership": dealer_id,
-                    "review": str(request.POST["review"]),
+                    "review": str(request.POST.get("review", "no review text")),
                     "purchase": bool(request.POST.get("purchase", "False") == "True"),
                     "purchase_date": str(request.POST.get("purchase_date", datetime.now())),
                     "car_make": car_model.car_make.name,
@@ -150,3 +156,7 @@ def add_review(request, dealer_id):
             return redirect("djangoapp:dealer_details", dealer_id=dealer_id)
     return redirect("djangoapp:index")
 
+# def debug_print_all_models():
+#     models = CarModel.objects.all()
+#     for m in models:
+#         print(f"\t({m.id}) :: {m}")

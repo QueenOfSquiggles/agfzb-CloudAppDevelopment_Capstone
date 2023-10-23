@@ -6,25 +6,43 @@
     <!--Add a nav bar here -->
     {% include "./components/navbar.html" %}
 
-    <div style="margin: auto; padding-left: 10%; padding-right: 10%">
+    {% url 'djangoapp:dealer_details' 50 as debugDealer %}
+    <div class="container">
+      
+      <div class="container row">
+        <div class="card border-info text-info col">
+          <h3 class="card-title">Debugging Target</h3>
+          <p class="card-text">
+            The debugging dealership can be quickly accessed <a href="{{debugDealer}}">here</a>. 
+            <br/>
+            Most of the data and reviews were populated there during testing purposes.
+          </p>
+        </div>
+      </div>
+      <br/>
       <!--Add a dealer table here -->
       <div class="table-responsive">
-        <table class="table table-sm table-striped table-bordered table-hover">
+        <table class="table table-sm table-striped table-bordered table-hover" id="table" data-filter-control="true">
           <thead>
             <tr>
-              <th scope="col">ID</th>
-              <th scope="col">Name (Short Name)</th>
-              <th scope="col">Address</th>
-              <th scope="col">Lattitude / Longitude</th>
+              <th scope="col" data-field="id">ID</th>
+              <th scope="col" data-field="name">Name (Short Name)</th>
+              <th scope="col" data-field="city">City</th>
+              <th scope="col" data-field="address">Address</th>
+              <th scope="col" data-field="zip">Zip</th>
+              <th scope="col" data-field="state" data-filter-control="select">State</th>
             </tr>
           </thead>
           <tbody>
             {% for entry in dealers %}
+            {% url 'djangoapp:dealer_details' entry.id as dealerURL %}
             <tr>
               <th scope="row">{{entry.id}}</td>
-              <td><a href="/djangoapp/dealer/{{entry.id}}"> {{entry.full_name}} ({{entry.short_name}})</a></td>
-              <td>{{entry.address}}, {{entry.city}}, {{entry.st}} {{entry.zip}}</td>
-              <td>{{entry.lat}} / {{entry.long}}</td>
+              <td><a href="{{dealerURL}}"> {{entry.full_name}} ({{entry.short_name}})</a></td>
+              <td scope="col">{{entry.city}}</td>
+              <td scope="col">{{entry.address}}</td>
+              <td scope="col">{{entry.zip}}</td>
+              <td scope="col">{{entry.st}}</td>
             </tr>
             {% endfor %}
           </tbody>
@@ -32,4 +50,10 @@
       </div>
     </div>
   </body>
+  <script>
+    // Sets up bootstrap scripts for the dealership table to allow filtering by state
+    $(function(){
+      $('table').bootstrapTable()
+    })
+  </script>
 </html>
