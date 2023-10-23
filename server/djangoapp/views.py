@@ -95,12 +95,11 @@ def get_dealer_details(request, dealer_id):
     dealer = get_dealer_by_id(dealer_id)
     score = 0
     for rev in reviews:
-        match(rev.sentiment):
-            case "positive":
-                score += 1
-            case "negative":
-                score -= 1
-
+        if rev.sentiment == "positive":
+            score += 1
+        elif rev.sentiment == "negative":
+            score -= 1
+            
     return render(request, "djangoapp/dealer_details.html", context={
         "reviews" : reviews,
         "dealer": dealer,
